@@ -52,18 +52,18 @@
 7. Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.
   ```
   SELECT (Customer.FirstName || " " || Customer.LastName) AS CustomerName, Customer.Country,
-Invoice.Total AS InvoiceTotal, (Employee.FirstName || " " || Employee.LastName) AS SalesAgent
-FROM Customer
-JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId
-JOIN Employee ON Employee.EmployeeId = Customer.SupportRepId
+  Invoice.Total AS InvoiceTotal, (Employee.FirstName || " " || Employee.LastName) AS SalesAgent
+  FROM Customer
+  JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId
+  JOIN Employee ON Employee.EmployeeId = Customer.SupportRepId
   ```
 
 8. How many Invoices were there in 2009 and 2011? What are the respective total sales for each of those years?
   ```
-  SELECT SUM(Invoice.Total) as TotalSales, strftime('%Y', Invoice.InvoiceDate) AS InvoiceYear
+  SELECT COUNT(Invoice.InvoiceId) AS InvoiceCount, SUM(Invoice.Total) as TotalSales, strftime('%Y', Invoice.InvoiceDate) AS InvoiceYear
   FROM Invoice
   WHERE strftime('%Y', Invoice.InvoiceDate) = "2009" OR strftime('%Y', Invoice.InvoiceDate) = "2011"
-  GROUP BY strftime('%Y', Invoice.InvoiceDate)
+  GROUP BY InvoiceYear
   ```
 
 9. Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
@@ -178,12 +178,24 @@ JOIN Employee ON Employee.EmployeeId = Customer.SupportRepId
   GROUP BY SalesAgent
   ```
 
-22. Provide a query that shows the total sales per country. Which country's customers spent the most?
+22. Provide a query that shows the total sales per country. Which country's customers spent the most? USA
   ```
+  SELECT Invoice.BillingCountry AS Country, ROUND(SUM(Invoice.Total), 2) as TotalSales
+  FROM Invoice
+  GROUP BY Country
+  ORDER BY TotalSales desc
   ```
 
 23. Provide a query that shows the most purchased track of 2013.
   ```
+  SELECT TrackName, MAX(Sales)
+  FROM
+    (SELECT Track.Name as TrackName, SUM(InvoiceLine.Quantity) as Sales
+    FROM Track
+    JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+    JOIN Invoice ON Invoice.InvoiceId = InvoiceLine.InvoiceId WHERE strftime('%Y', Invoice.InvoiceDate) = "2013"
+    GROUP BY TrackName
+    ORDER BY Sales desc)
   ```
 
 24. Provide a query that shows the top 5 most purchased tracks over all.
