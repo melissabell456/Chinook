@@ -84,46 +84,98 @@ JOIN Employee ON Employee.EmployeeId = Customer.SupportRepId
 
 11. Provide a query that includes the track name with each invoice line item.
   ```
+  SELECT InvoiceLine.*, Track.Name AS TrackName
+  FROM InvoiceLine
+  JOIN Track ON InvoiceLine.TrackId = Track.TrackId
   ```
 
 12. Provide a query that includes the purchased track name AND artist name with each invoice line item.
   ```
+  SELECT Track.Name AS TrackName, Artist.Name AS ArtistName, InvoiceLine.InvoiceLineId AS AssociatedInvoiceLine
+  FROM Track
+  JOIN Album ON Album.AlbumId = Track.AlbumId
+  JOIN Artist ON Album.ArtistId = Artist.ArtistId
+  JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
   ```
 
 13. Provide a query that shows the # of invoices per country. HINT: GROUP BY
   ```
+  SELECT Invoice.BillingCountry, COUNT(Invoice.InvoiceId) AS InvoiceCount
+  FROM Invoice
+  GROUP BY Invoice.BillingCountry
   ```
 
 14. Provide a query that shows the total number of tracks in each playlist. The Playlist name should be included on the resultant table.
   ```
+  SELECT Playlist.Name AS Playlist, COUNT(Track.TrackID) AS NumOfSongs
+  FROM Playlist
+  JOIN PlaylistTrack ON PlaylistTrack.PlaylistId = Playlist.PlaylistId
+  JOIN Track ON PlaylistTrack.TrackId = Track.TrackId
+  GROUP BY Playlist.Name
   ```
 
 15. Provide a query that shows all the Tracks, but displays no IDs. The resultant table should include the Album name, Media type and Genre.
   ```
+  SELECT Track.Name AS SongName, Album.Title AS AlbumName, MediaType.Name AS MediaTypeName, Genre.Name AS Genre
+  FROM Track
+  JOIN Album ON Album.AlbumId = Track.AlbumId
+  JOIN MediaType ON MediaType.MediaTypeId = Track.MediaTypeId
+  JOIN Genre ON Genre.GenreId = Track.GenreId
   ```
 
 16. Provide a query that shows all Invoices but includes the # of invoice line items.
   ```
+  SELECT Invoice.InvoiceId AS Invoice, COUNT(InvoiceLine.InvoiceLineId) AS LineCount
+  FROM Invoice
+  JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId
+  GROUP BY Invoice.InvoiceId
   ```
 
 17. Provide a query that shows total sales made by each sales agent.
   ```
+  SELECT (Employee.FirstName || " " || Employee.LastName) AS SalesRep, ROUND(SUM(Invoice.Total), 2) AS TotalSales
+  FROM Employee
+  JOIN Customer ON Customer.SupportRepId = Employee.EmployeeId
+  JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId
+  GROUP BY Employee.FirstName
   ```
 
-18. Which sales agent made the most in sales in 2009?
+18. Which sales agent made the most in sales in 2009? Steve Johnson - $164.34
   ```
+  SELECT (Employee.FirstName || " " || Employee.LastName) AS SalesRep, ROUND(SUM(Invoice.Total), 2) AS TotalSales
+  FROM Employee
+  JOIN Customer ON Customer.SupportRepId = Employee.EmployeeId
+  JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId WHERE strftime('%Y', Invoice.InvoiceDate) = "2009"
+  GROUP BY Employee.FirstName
+  ORDER BY TotalSales desc
   ```
 
-19. Which sales agent made the most in sales in 2010?
+19. Which sales agent made the most in sales in 2010? Jane Peacock - 221.92
   ```
+  SELECT (Employee.FirstName || " " || Employee.LastName) AS SalesRep, ROUND(SUM(Invoice.Total), 2) AS TotalSales
+  FROM Employee
+  JOIN Customer ON Customer.SupportRepId = Employee.EmployeeId
+  JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId WHERE strftime('%Y', Invoice.InvoiceDate) = "2010"
+  GROUP BY Employee.FirstName
+  ORDER BY TotalSales desc
   ```
 
-20. Which sales agent made the most in sales over all?
+20. Which sales agent made the most in sales over all? Jane Peacock -	833.04
   ```
+  SELECT (Employee.FirstName || " " || Employee.LastName) AS SalesRep, ROUND(SUM(Invoice.Total), 2) AS TotalSales
+  FROM Employee
+  JOIN Customer ON Customer.SupportRepId = Employee.EmployeeId
+  JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId
+  GROUP BY Employee.FirstName
+  ORDER BY TotalSales desc
   ```
 
 21. Provide a query that shows the # of customers assigned to each sales agent.
   ```
+  SELECT (Employee.FirstName ||" "|| Employee.LastName) AS SalesAgent, COUNT(Customer.CustomerId) AS TotalCustomers
+  FROM Employee
+  JOIN Customer ON Customer.SupportRepId = Employee.EmployeeId
+  GROUP BY SalesAgent
   ```
 
 22. Provide a query that shows the total sales per country. Which country's customers spent the most?
