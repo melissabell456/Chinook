@@ -51,18 +51,35 @@
 
 7. Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.
   ```
+  SELECT (Customer.FirstName || " " || Customer.LastName) AS CustomerName, Customer.Country,
+Invoice.Total AS InvoiceTotal, (Employee.FirstName || " " || Employee.LastName) AS SalesAgent
+FROM Customer
+JOIN Invoice ON Invoice.CustomerId = Customer.CustomerId
+JOIN Employee ON Employee.EmployeeId = Customer.SupportRepId
   ```
 
 8. How many Invoices were there in 2009 and 2011? What are the respective total sales for each of those years?
   ```
+  SELECT SUM(Invoice.Total) as TotalSales, strftime('%Y', Invoice.InvoiceDate) AS InvoiceYear
+  FROM Invoice
+  WHERE strftime('%Y', Invoice.InvoiceDate) = "2009" OR strftime('%Y', Invoice.InvoiceDate) = "2011"
+  GROUP BY strftime('%Y', Invoice.InvoiceDate)
   ```
 
 9. Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
   ```
+  SELECT Invoice.InvoiceId, COUNT(InvoiceLine.InvoiceLineId) AS LineCount
+  FROM Invoice
+  JOIN InvoiceLine ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+  WHERE Invoice.InvoiceId = 37
   ```
 
 10. Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for each Invoice. HINT: GROUP BY
   ```
+  SELECT Invoice.InvoiceId, COUNT(InvoiceLine.InvoiceLineId) AS LineCount
+  FROM Invoice
+  JOIN InvoiceLine ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+  GROUP BY Invoice.InvoiceId
   ```
 
 11. Provide a query that includes the track name with each invoice line item.
