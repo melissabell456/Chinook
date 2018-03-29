@@ -200,14 +200,44 @@
 
 24. Provide a query that shows the top 5 most purchased tracks over all.
   ```
+  SELECT Track.Name AS TrackName, COUNT(InvoiceLine.Quantity) as Sales
+  FROM Track
+  JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+  GROUP BY TrackName
+  ORDER BY Sales desc 
+  LIMIT 5
   ```
 
 25. Provide a query that shows the top 3 best selling artists.
   ```
+  SELECT Artist.Name AS ArtistName, COUNT(InvoiceLine.Quantity) AS TracksSold
+  FROM Artist
+  JOIN Album ON Album.ArtistId = Artist.ArtistId
+  JOIN Track ON Track.AlbumId = Album.AlbumId
+  JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+  GROUP BY ArtistName 
+  ORDER BY TracksSold desc 
+  LIMIT 3
   ```
 
 26. Provide a query that shows the most purchased Media Type.
   ```
+  SELECT MediaTypeName, MAX(TotalSales)
+  FROM
+    (SELECT MediaType.Name AS MediaTypeName, COUNT(InvoiceLine.Quantity) AS TotalSales
+    FROM MediaType
+    JOIN Track ON Track.MediaTypeId = MediaType.MediaTypeId
+    JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+    GROUP BY MediaTypeName)
   ```
 
 27. Provide a query that shows the number tracks purchased in all invoices that contain more than one genre.
+ ```
+ SELECT Invoice.InvoiceId AS InvoiceNumber, SUM(InvoiceLine.Quantity) AS TrackCount, group_concat(DISTINCT Genre.Name) AS Genres, COUNT(DISTINCT Genre.Name) AS TotalGenres
+  FROM Invoice
+  JOIN InvoiceLine ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+  JOIN Track ON Track.TrackId = InvoiceLine.TrackId
+  JOIN Genre ON Genre.GenreId = Track.GenreId
+  GROUP BY InvoiceNumber
+  HAVING TotalGenres > 1
+ ```
